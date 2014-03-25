@@ -21,9 +21,12 @@ namespace MaxClique
 
         private List<Friend> _friends = new List<Friend>();
         private FBLogin fbLoginBrowser = new FBLogin();
-        private bool _authorized;
-        private string _accessToken = "";
         private Gene[] population = new Gene[100];
+        private Random rand = new Random(1);
+        private bool _authorized = false;
+        private string _accessToken = "";
+        private int numFriends = 0;
+        private Neo db;
 
         #endregion
 
@@ -32,6 +35,7 @@ namespace MaxClique
         public Form1()
         {
             InitializeComponent();
+            db = new Neo();
         }
 
         #endregion
@@ -43,11 +47,101 @@ namespace MaxClique
            fbLoginBrowser.ShowDialog(); 
         }
 
-        async private void button2_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         {
-            _accessToken = fbLoginBrowser.AccessToken;
-            _authorized = fbLoginBrowser.Authorized;
+            authToken();
+            getFriendsList();
+        }
 
+        private void initPopulation_Click(object sender, EventArgs e)
+        {
+            initializePopulation();
+        }
+
+        private void neoConnect_Click(object sender, EventArgs e)
+        {
+            populateGraph();
+        }
+
+        private void relateFriends_Click(object sender, EventArgs e)
+        {
+            createRelationships();
+        }
+
+        #endregion
+
+        #region Evolve!
+
+        private void initializePopulation()
+        {
+            for (int i = 0; i < numFriends; i++ )
+            {
+                population[i] = new Gene(numFriends, rand);
+            }
+        }
+
+        private void testFitness()
+        {
+            foreach (Gene gene in population)
+            {
+            }
+        }
+
+        private void selectFitest()
+        {
+        }
+
+        private void recombine()
+        {
+        }
+
+        private void terminate()
+        {
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        #region Local Graph Helpers
+
+        private bool friends(Friend f1, Friend f2, FacebookClient fb)
+        {
+            dynamic friendsTaskResult = fb.Get("/"+f1.ID+"/friends/"+f2.ID);
+            var result = (IDictionary<string, object>)friendsTaskResult;
+            var data = (IEnumerable<object>)result["data"];
+            if (data != null)
+                return false;
+            else
+                return true;
+        }
+
+        private void populateGraph()
+        {
+            foreach (Friend frnd in _friends)
+                db.createUser(frnd);
+        }
+
+        public void createRelationships()
+        {
+            var fb = new FacebookClient(_accessToken);
+            var arrayFromList = _friends.ToArray();
+            for (int i = 0; i < arrayFromList.Length; i++)
+            {
+                for (int k = i+1; k < arrayFromList.Length; k++)
+                {
+                    if (friends(arrayFromList[i], arrayFromList[k], fb))
+                        db.relateUsers(arrayFromList[i], arrayFromList[k]);
+                }
+            }
+        }
+
+        #endregion
+
+        #region ListView Helpers
+
+        async private void getFriendsList()
+        {
             if (_authorized)
             {
                 var fb = new FacebookClient(_accessToken);
@@ -74,12 +168,7 @@ namespace MaxClique
                 MessageBox.Show("Not logged into Facebook!", "Not Currently Logged In", MessageBoxButtons.OK,
                                 MessageBoxIcon.Error);
             }
-
         }
-
-        #endregion
-
-        #region Private Methods
 
         private void UpdateListView()
         {
@@ -100,6 +189,14 @@ namespace MaxClique
             newItem.Tag = friend.ID;
 
             friendsListView.Items.Add(newItem);
+        }
+
+        #endregion
+
+        private void authToken()
+        {
+            _accessToken = fbLoginBrowser.AccessToken;
+            _authorized = fbLoginBrowser.Authorized;
         }
 
         #endregion
