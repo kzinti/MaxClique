@@ -38,6 +38,7 @@ namespace MaxClique
             this.initPopulation = new System.Windows.Forms.Button();
             this.neoConnect = new System.Windows.Forms.Button();
             this.relateFriends = new System.Windows.Forms.Button();
+            this.updateList = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // FacebookLogin
@@ -70,7 +71,7 @@ namespace MaxClique
             // 
             // initPopulation
             // 
-            this.initPopulation.Location = new System.Drawing.Point(561, 100);
+            this.initPopulation.Location = new System.Drawing.Point(561, 145);
             this.initPopulation.Name = "initPopulation";
             this.initPopulation.Size = new System.Drawing.Size(75, 38);
             this.initPopulation.TabIndex = 4;
@@ -80,7 +81,7 @@ namespace MaxClique
             // 
             // neoConnect
             // 
-            this.neoConnect.Location = new System.Drawing.Point(562, 145);
+            this.neoConnect.Location = new System.Drawing.Point(562, 190);
             this.neoConnect.Name = "neoConnect";
             this.neoConnect.Size = new System.Drawing.Size(75, 38);
             this.neoConnect.TabIndex = 5;
@@ -90,7 +91,7 @@ namespace MaxClique
             // 
             // relateFriends
             // 
-            this.relateFriends.Location = new System.Drawing.Point(561, 189);
+            this.relateFriends.Location = new System.Drawing.Point(561, 234);
             this.relateFriends.Name = "relateFriends";
             this.relateFriends.Size = new System.Drawing.Size(75, 38);
             this.relateFriends.TabIndex = 6;
@@ -98,11 +99,22 @@ namespace MaxClique
             this.relateFriends.UseVisualStyleBackColor = true;
             this.relateFriends.Click += new System.EventHandler(this.relateFriends_Click);
             // 
+            // updateList
+            // 
+            this.updateList.Location = new System.Drawing.Point(562, 101);
+            this.updateList.Name = "updateList";
+            this.updateList.Size = new System.Drawing.Size(75, 38);
+            this.updateList.TabIndex = 7;
+            this.updateList.Text = "Update List View";
+            this.updateList.UseVisualStyleBackColor = true;
+            this.updateList.Click += new System.EventHandler(this.updateList_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(646, 352);
+            this.Controls.Add(this.updateList);
             this.Controls.Add(this.relateFriends);
             this.Controls.Add(this.neoConnect);
             this.Controls.Add(this.initPopulation);
@@ -123,6 +135,7 @@ namespace MaxClique
         private System.Windows.Forms.Button initPopulation;
         private System.Windows.Forms.Button neoConnect;
         private System.Windows.Forms.Button relateFriends;
+        private System.Windows.Forms.Button updateList;
 
     }
 }

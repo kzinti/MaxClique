@@ -19,14 +19,12 @@ namespace MaxClique
     {
         #region Local Variable Declaration
 
-        private List<Friend> _friends = new List<Friend>();
-        private FBLogin fbLoginBrowser = new FBLogin();
-        private Gene[] population = new Gene[100];
-        private Random rand = new Random(1);
-        private bool _authorized = false;
-        private string _accessToken = "";
-        private int numFriends = 0;
         private Neo db;
+        private int numFriends = 0;
+        private FBLogin fbLoginBrowser;
+        private Random rand = new Random(1);
+        private Gene[] population = new Gene[100];
+        private FacebookConnection fc = new FacebookConnection();
 
         #endregion
 
@@ -36,6 +34,7 @@ namespace MaxClique
         {
             InitializeComponent();
             db = new Neo();
+            fbLoginBrowser = new FBLogin(fc);
         }
 
         #endregion
@@ -49,8 +48,12 @@ namespace MaxClique
 
         private void button2_Click(object sender, EventArgs e)
         {
-            authToken();
-            getFriendsList();
+            fc.getFriendsList();
+        }
+
+        private void updateList_Click(object sender, EventArgs e)
+        {
+            UpdateListView();
         }
 
         private void initPopulation_Click(object sender, EventArgs e)
@@ -105,33 +108,21 @@ namespace MaxClique
 
         #region Local Graph Helpers
 
-        private bool friends(Friend f1, Friend f2, FacebookClient fb)
-        {
-            dynamic friendsTaskResult = fb.Get("/"+f1.ID+"/friends/"+f2.ID);
-            var result = (IDictionary<string, object>)friendsTaskResult;
-            var data = (IEnumerable<object>)result["data"];
-            if (data != null)
-                return false;
-            else
-                return true;
-        }
-
         private void populateGraph()
         {
-            foreach (Friend frnd in _friends)
+            foreach (Friend frnd in fc.friendsArray())
                 db.createUser(frnd);
         }
 
         public void createRelationships()
         {
-            var fb = new FacebookClient(_accessToken);
-            var arrayFromList = _friends.ToArray();
-            for (int i = 0; i < arrayFromList.Length; i++)
+            var friendsArray = fc.friendsArray();
+            for (int i = 0; i < friendsArray.Length; i++)
             {
-                for (int k = i+1; k < arrayFromList.Length; k++)
+                for (int k = i+1; k < friendsArray.Length; k++)
                 {
-                    if (friends(arrayFromList[i], arrayFromList[k], fb))
-                        db.relateUsers(arrayFromList[i], arrayFromList[k]);
+                    if (fc.areFriends(friendsArray[i], friendsArray[k]))
+                        db.relateUsers(friendsArray[i], friendsArray[k]);
                 }
             }
         }
@@ -140,42 +131,12 @@ namespace MaxClique
 
         #region ListView Helpers
 
-        async private void getFriendsList()
-        {
-            if (_authorized)
-            {
-                var fb = new FacebookClient(_accessToken);
-
-                dynamic friendsTaskResult = await fb.GetTaskAsync("/me/friends");
-                var results = (IDictionary<string, object>)friendsTaskResult;
-                var data = (IEnumerable<object>)results["data"];
-                foreach (var item in data)
-                {
-                    var friend = (IDictionary<string, object>)item;
-                    Friend newFriend = new Friend
-                    {
-                        Name = (string)friend["name"],
-                        ID = (string)friend["id"]
-                    };
-                    _friends.Add(newFriend);
-                }
-
-                UpdateListView();
-
-            }
-            else
-            {
-                MessageBox.Show("Not logged into Facebook!", "Not Currently Logged In", MessageBoxButtons.OK,
-                                MessageBoxIcon.Error);
-            }
-        }
-
         private void UpdateListView()
         {
 
             friendsListView.Items.Clear();
 
-            foreach (Friend friend in _friends)
+            foreach (Friend friend in fc.friendsArray())
             {
                 AddFriendToListView(friend);
             }
@@ -193,11 +154,6 @@ namespace MaxClique
 
         #endregion
 
-        private void authToken()
-        {
-            _accessToken = fbLoginBrowser.AccessToken;
-            _authorized = fbLoginBrowser.Authorized;
-        }
 
         #endregion
 
