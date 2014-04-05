@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Evolve.cs" />
     <Compile Include="FacebookConnection.cs" />
     <Compile Include="FBLogin.cs">
       <SubType>Form</SubType>

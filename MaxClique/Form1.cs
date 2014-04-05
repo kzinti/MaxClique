@@ -22,8 +22,6 @@ namespace MaxClique
         private Neo db;
         private int numFriends = 0;
         private FBLogin fbLoginBrowser;
-        private Random rand = new Random(1);
-        private Gene[] population = new Gene[100];
         private FacebookConnection fc = new FacebookConnection();
 
         #endregion
@@ -58,7 +56,6 @@ namespace MaxClique
 
         private void initPopulation_Click(object sender, EventArgs e)
         {
-            initializePopulation();
         }
 
         private void neoConnect_Click(object sender, EventArgs e)
@@ -69,37 +66,6 @@ namespace MaxClique
         private void relateFriends_Click(object sender, EventArgs e)
         {
             //createRelationships();
-        }
-
-        #endregion
-
-        #region Evolve!
-
-        private void initializePopulation()
-        {
-            for (int i = 0; i < numFriends; i++ )
-            {
-                population[i] = new Gene(numFriends, rand);
-            }
-        }
-
-        private void testFitness()
-        {
-            foreach (Gene gene in population)
-            {
-            }
-        }
-
-        private void selectFitest()
-        {
-        }
-
-        private void recombine()
-        {
-        }
-
-        private void terminate()
-        {
         }
 
         #endregion
