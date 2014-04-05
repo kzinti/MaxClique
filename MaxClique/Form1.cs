@@ -43,17 +43,17 @@ namespace MaxClique
 
         private void button1_Click(object sender, EventArgs e)
         {
-           fbLoginBrowser.ShowDialog(); 
+           //fbLoginBrowser.ShowDialog(); 
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            fc.getFriendsList();
+            //fc.getFriendsList();
         }
 
         private void updateList_Click(object sender, EventArgs e)
         {
-            UpdateListView();
+            //UpdateListView();
         }
 
         private void initPopulation_Click(object sender, EventArgs e)
@@ -63,12 +63,12 @@ namespace MaxClique
 
         private void neoConnect_Click(object sender, EventArgs e)
         {
-            populateGraph();
+            //populateGraph();
         }
 
         private void relateFriends_Click(object sender, EventArgs e)
         {
-            createRelationships();
+            //createRelationships();
         }
 
         #endregion
@@ -118,13 +118,9 @@ namespace MaxClique
         {
             var friendsArray = fc.friendsArray();
             for (int i = 0; i < friendsArray.Length; i++)
-            {
                 for (int k = i+1; k < friendsArray.Length; k++)
-                {
                     if (fc.areFriends(friendsArray[i], friendsArray[k]))
                         db.relateUsers(friendsArray[i], friendsArray[k]);
-                }
-            }
         }
 
         #endregion
@@ -153,7 +149,6 @@ namespace MaxClique
         }
 
         #endregion
-
 
         #endregion
 

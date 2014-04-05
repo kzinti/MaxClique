@@ -10,10 +10,15 @@ namespace MaxClique
 {
     class Neo
     {
-        GraphClient client = new GraphClient(new Uri("http://localhost:7474/db/data"));
-        public void createUser(Friend newFriend)
+        GraphClient client = new GraphClient(new Uri("http://192.168.0.100:7474/db/data"));
+
+        public Neo()
         {
             client.Connect();
+        }
+
+        public void createUser(Friend newFriend)
+        {
             client.Cypher
                 .Create("(friend:Friend {newFriend})")
                 .WithParam("newFriend", newFriend)
@@ -26,7 +31,7 @@ namespace MaxClique
                 .Match("(friend1:Friend)", "(friend2:Friend)")
                 .Where((Friend friend1) => friend1.ID == fnd1.ID)
                 .AndWhere((Friend friend2) => friend2.ID == fnd2.ID)
-                .Create("friend1-[:FRIENDS_WITH]->friend2")
+                .CreateUnique("friend1-[:FRIENDS_WITH]->friend2")
                 .ExecuteWithoutResults();
         }
     }
