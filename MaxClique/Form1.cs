@@ -20,7 +20,7 @@ namespace MaxClique
         #region Local Variable Declaration
 
         private Neo db;
-        private int numFriends = 0;
+        private Evolve evolve;
         private FBLogin fbLoginBrowser;
         private FacebookConnection fc = new FacebookConnection();
 
@@ -32,6 +32,7 @@ namespace MaxClique
         {
             InitializeComponent();
             db = new Neo();
+            evolve = new Evolve(db);
             fbLoginBrowser = new FBLogin(fc);
         }
 
@@ -51,11 +52,12 @@ namespace MaxClique
 
         private void updateList_Click(object sender, EventArgs e)
         {
-            //UpdateListView();
+            UpdateListView();
         }
 
         private void initPopulation_Click(object sender, EventArgs e)
         {
+            evolve.rndUserNFriends();
         }
 
         private void neoConnect_Click(object sender, EventArgs e)
@@ -73,6 +75,15 @@ namespace MaxClique
         #region Helper Methods
 
         #region Local Graph Helpers
+
+        private void setUserNumFriends()
+        {
+            foreach (Friend friend in db.allFriends())
+            {
+                int nfriends = db.numFriends(friend);
+                db.setNumFriends(friend, nfriends);
+            }
+        }
 
         private void populateGraph()
         {
@@ -98,7 +109,7 @@ namespace MaxClique
 
             friendsListView.Items.Clear();
 
-            foreach (Friend friend in fc.friendsArray())
+            foreach (Friend friend in evolve.getFriends())
             {
                 AddFriendToListView(friend);
             }

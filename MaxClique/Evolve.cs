@@ -12,7 +12,33 @@ namespace MaxClique
         private Gene[] population = new Gene[100];
         int numFriends = 0;
         private Random rand = new Random(1);
+        Neo neo;
+        private List<Friend> _friends = new List<Friend>();
         #endregion
+
+        public Evolve(Neo db)
+        {
+            neo = db;
+            allFriends();
+        }
+
+        public Friend[] getFriends()
+        {
+            return _friends.ToArray();
+        }
+
+        public void rndUserNFriends()
+        {
+            var friendsArray = _friends.ToArray();
+            int index = rand.Next(_friends.Count);
+            var rndFriend = friendsArray[index];
+            var userNFriends = neo.numFriends(rndFriend);
+        }
+
+        private void allFriends()
+        {
+            _friends = neo.allFriends(); 
+        }
 
         private void initializePopulation()
         {
@@ -34,6 +60,14 @@ namespace MaxClique
         }
 
         private void recombine()
+        {
+        }
+
+        private void mutate()
+        {
+        }
+
+        private void replace()
         {
         }
 

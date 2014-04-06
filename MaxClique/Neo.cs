@@ -17,6 +17,47 @@ namespace MaxClique
             client.Connect();
         }
 
+        public dynamic allFriends()
+        {
+            var allUsers = client.Cypher
+                .Match("(users:Friend)")
+                .Return((users) => users.As<Friend>())
+                .Results;
+            return allUsers;
+        }
+
+        public dynamic numFriends(Friend usr)
+        {
+            //var usrWfrnd = client.Cypher
+            //    .OptionalMatch("(user:Friend)-[FRIENDS_WITH]-(friend:Friend)")
+            //    .Where((Friend user) => user.ID == usr.ID)
+            //    .Return((user, friend) => new
+            //    {
+            //        User = user.As<Friend>(),
+            //        NumberOfFriends = friend.Count()
+            //    })
+            //    .Results;
+            var frndC = client.Cypher
+                .OptionalMatch("(user:Friend)-[FRIENDS_WITH]-(friend:Friend)")
+                .Where((Friend user) => user.ID == usr.ID)
+                .Return((friend) => friend.Count() )
+                .Results;
+            int num = (int)frndC.ElementAt<long>(0);
+            return num;
+        }
+
+        public void setNumFriends(Friend usr, int numFriends)
+        {
+            client.Cypher
+                .Match("(user:Friend)")
+                .Where((Friend user) => user.ID == usr.ID)
+                .Set("user.numFriends = {numFriends}")
+                .WithParam("numFriends", numFriends)
+                .ExecuteWithoutResults();
+        }
+
+        #region Helpers to Build Graph
+
         public void createUser(Friend newFriend)
         {
             client.Cypher
@@ -34,5 +75,7 @@ namespace MaxClique
                 .CreateUnique("friend1-[:FRIENDS_WITH]->friend2")
                 .ExecuteWithoutResults();
         }
+
+        #endregion
     }
 }
