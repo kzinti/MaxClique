@@ -23,7 +23,7 @@ namespace MaxClique
                 .Match("(users:Friend)")
                 .Return((users) => users.As<Friend>())
                 .Results;
-            return allUsers;
+            return (Friend) allUsers;
         }
 
         public dynamic getUserNFriends(Friend usr)

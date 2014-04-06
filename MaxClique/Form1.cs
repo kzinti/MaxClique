@@ -21,6 +21,7 @@ namespace MaxClique
 
         private Neo db;
         private Evolve evolve;
+        private GraphBuilder gb;
         private FBLogin fbLoginBrowser;
         private FacebookConnection fc = new FacebookConnection();
 
@@ -32,6 +33,7 @@ namespace MaxClique
         {
             InitializeComponent();
             db = new Neo();
+            gb = new GraphBuilder(db, fc);
             evolve = new Evolve(db);
             fbLoginBrowser = new FBLogin(fc);
         }
@@ -58,7 +60,7 @@ namespace MaxClique
         private void initPopulation_Click(object sender, EventArgs e)
         {
             //evolve.rndUserNFriends();
-            setUserNumFriends();
+            gb.setUserNumFriends();
         }
 
         private void neoConnect_Click(object sender, EventArgs e)
@@ -74,34 +76,6 @@ namespace MaxClique
         #endregion
 
         #region Helper Methods
-
-        #region Local Graph Helpers
-
-        private void setUserNumFriends()
-        {
-            foreach (Friend friend in db.allFriends())
-            {
-                int nfriends = db.numFriends(friend);
-                db.setNumFriends(friend, nfriends);
-            }
-        }
-
-        private void populateGraph()
-        {
-            foreach (Friend frnd in fc.friendsArray())
-                db.createUser(frnd);
-        }
-
-        public void createRelationships()
-        {
-            var friendsArray = fc.friendsArray();
-            for (int i = 0; i < friendsArray.Length; i++)
-                for (int k = i+1; k < friendsArray.Length; k++)
-                    if (fc.areFriends(friendsArray[i], friendsArray[k]))
-                        db.relateUsers(friendsArray[i], friendsArray[k]);
-        }
-
-        #endregion
 
         #region ListView Helpers
 
