@@ -57,7 +57,8 @@ namespace MaxClique
 
         private void initPopulation_Click(object sender, EventArgs e)
         {
-            evolve.rndUserNFriends();
+            //evolve.rndUserNFriends();
+            setUserNumFriends();
         }
 
         private void neoConnect_Click(object sender, EventArgs e)

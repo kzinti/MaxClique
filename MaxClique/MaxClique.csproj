@@ -80,6 +80,7 @@
     <Compile Include="Neo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserNFriends.cs" />
     <EmbeddedResource Include="FBLogin.resx">
       <DependentUpon>FBLogin.cs</DependentUpon>
     </EmbeddedResource>
