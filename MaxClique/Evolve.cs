@@ -16,12 +16,15 @@ namespace MaxClique
         private List<Friend> _friends = new List<Friend>();
         #endregion
 
+        #region Constructor
         public Evolve(Neo db)
         {
             neo = db;
             allFriends();
         }
+        #endregion
 
+        #region Helper Methods
         public Friend[] getFriends()
         {
             return _friends.ToArray();
@@ -39,6 +42,7 @@ namespace MaxClique
         {
             _friends = neo.allFriends(); 
         }
+        #endregion
 
         private void initializePopulation()
         {

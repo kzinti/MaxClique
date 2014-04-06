@@ -28,5 +28,4 @@ namespace MaxClique
                 return true;
         }
     }
-
 }

@@ -50,6 +50,18 @@ namespace MaxClique
             return num;
         }
 
+        #region Helpers to Build the Local Graph
+
+        public void setLocalID(Friend usr, int ID)
+        {
+            client.Cypher
+                .Match("(user:Freind)")
+                .Where((Friend user) => user.ID == usr.ID)
+                .Set("user.localID = {localID}")
+                .WithParam("localID", ID)
+                .ExecuteWithoutResults();
+        }
+
         public void setNumFriends(Friend usr, int numFriends)
         {
             client.Cypher
@@ -59,8 +71,6 @@ namespace MaxClique
                 .WithParam("numFriends", numFriends)
                 .ExecuteWithoutResults();
         }
-
-        #region Helpers to Build Graph
 
         public void createUser(Friend newFriend)
         {
