@@ -41,15 +41,6 @@ namespace MaxClique
 
         public dynamic numFriends(Friend usr)
         {
-            //var usrWfrnd = client.Cypher
-            //    .OptionalMatch("(user:Friend)-[FRIENDS_WITH]-(friend:Friend)")
-            //    .Where((Friend user) => user.ID == usr.ID)
-            //    .Return((user, friend) => new
-            //    {
-            //        User = user.As<Friend>(),
-            //        NumberOfFriends = friend.Count()
-            //    })
-            //    .Results;
             var frndC = client.Cypher
                 .OptionalMatch("(user:Friend)-[FRIENDS_WITH]-(friend:Friend)")
                 .Where((Friend user) => user.ID == usr.ID)
