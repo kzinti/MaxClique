@@ -14,6 +14,7 @@ namespace MaxClique
         private Random rand = new Random(1);
         Neo neo;
         private List<Friend> _friends = new List<Friend>();
+        private LinkedList<Friend> _linkedFriends = new LinkedList<Friend>();
         #endregion
 
         #region Constructor
@@ -46,9 +47,22 @@ namespace MaxClique
 
         private void initializePopulation()
         {
-            for (int i = 0; i < numFriends; i++)
+            Friend[] rndfrnd = _friends.ToArray();
+            foreach (Gene gene in population)
             {
-                population[i] = new Gene(numFriends, rand);
+                Friend rnd = rndfrnd[rand.Next(rndfrnd.Length)];
+                UserNFriends unf = neo.getUserNFriends(rnd);
+                gene.bitString[unf.user.localID] = true;
+                Friend nothaFrnd = unf.popRndFrnd(rand);
+                gene.bitString[nothaFrnd.localID] = true;
+                while (unf.notEmpty())
+                {
+                    Friend yetNuthaFrnd = unf.popRndFrnd(rand);
+                    if (gene.frndInClique(yetNuthaFrnd))
+                        gene.bitString[yetNuthaFrnd.localID] = true;
+                }
+                //gene.bitString[unf.friends[rand.Next(unf.friends.Length)].localID] = true;
+
             }
         }
 

@@ -60,7 +60,7 @@ namespace MaxClique
         private void initPopulation_Click(object sender, EventArgs e)
         {
             //evolve.rndUserNFriends();
-            gb.setUserNumFriends();
+            gb.setLocalIDs();
         }
 
         private void neoConnect_Click(object sender, EventArgs e)

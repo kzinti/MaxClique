@@ -11,21 +11,16 @@ namespace MaxClique
         public bool[] bitString { get; set; }
         public int fitness { get; set; }
 
-        public Gene(int numFriends, Random rand)
+        public Gene(int size)
         {
-            bitString = new bool[numFriends];
-            for (int i = 0; i < numFriends; i++ )
-            {
-                bitString[i] = randomBit(rand);
-            }
+            bitString = new bool[size];
         }
 
-        private bool randomBit(Random rand)
+        internal bool frndInClique(Friend yetNuthaFrnd, Neo neo)
         {
-            if (rand.Next(2) == 0)
-                return false;
-            else
-                return true;
+            foreach (bool bit in bitString)
+                if (bit == true)
+                    if Neo.
         }
     }
 }

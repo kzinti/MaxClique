@@ -16,7 +16,7 @@ namespace MaxClique
         #region Constructor
         public GraphBuilder(Neo neo, FacebookConnection fbconn)
         {
-            neo = db;
+            db = neo;
             fc = fbconn;
         }
         #endregion
@@ -48,8 +48,8 @@ namespace MaxClique
         public void setLocalIDs()
         {
             int i = 0;
-            Friend[] friends = db.allFriends();
-            IEnumerable<Friend> sortedFriends = friends.OrderBy(friend => friend.localID);
+            IEnumerable<Friend> friends = db.allFriends();
+            IEnumerable<Friend> sortedFriends = friends.OrderByDescending(friend => friend.numFriends);
             foreach (Friend friend in sortedFriends)
             {
                 db.setLocalID(friend, i);

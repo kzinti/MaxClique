@@ -17,13 +17,18 @@ namespace MaxClique
             client.Connect();
         }
 
+        internal bool friends(Friend f1, Friend f2)
+        {
+
+        }
+
         public dynamic allFriends()
         {
             var allUsers = client.Cypher
                 .Match("(users:Friend)")
                 .Return((users) => users.As<Friend>())
                 .Results;
-            return (Friend) allUsers;
+            return allUsers;
         }
 
         public dynamic getUserNFriends(Friend usr)
@@ -52,13 +57,13 @@ namespace MaxClique
 
         #region Helpers to Build the Local Graph
 
-        public void setLocalID(Friend usr, int ID)
+        public void setLocalID(Friend usr, int localID)
         {
             client.Cypher
-                .Match("(user:Freind)")
+                .Match("(user:Friend)")
                 .Where((Friend user) => user.ID == usr.ID)
                 .Set("user.localID = {localID}")
-                .WithParam("localID", ID)
+                .WithParam("localID", localID)
                 .ExecuteWithoutResults();
         }
 
