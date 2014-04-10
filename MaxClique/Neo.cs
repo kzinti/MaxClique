@@ -96,5 +96,15 @@ namespace MaxClique
         }
 
         #endregion
+
+        internal Friend getUser(int localID)
+        {
+            Friend frnd = (Friend) client.Cypher
+                .Match("(u:Friend)")
+                .Where((Friend user) => user.localID == localID)
+                .Return((user) => user)
+                .Results;
+            return frnd;
+        }
     }
 }

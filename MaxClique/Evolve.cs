@@ -9,87 +9,97 @@ namespace MaxClique
     class Evolve
     {
         #region Local Variable Declaration
-        private Gene[] population = new Gene[100];
-        int numFriends = 0;
-        private Random rand = new Random(1);
-        Neo neo;
-        private List<Friend> _friends = new List<Friend>();
-        private LinkedList<Friend> _linkedFriends = new LinkedList<Friend>();
+            Neo neo;
+            int generation = 0;
+            int crossoverPoints = 10;
+            Gene[] selected = new Gene[2];
+            Random rand = new Random(1);
+            Gene[] population = new Gene[100];
+            List<Friend> _friends = new List<Friend>();
         #endregion
 
         #region Constructor
-        public Evolve(Neo db)
-        {
-            neo = db;
-            allFriends();
-        }
+            public Evolve(Neo db)
+            {
+                neo = db;
+                allFriends();
+            }
         #endregion
 
         #region Helper Methods
-        public Friend[] getFriends()
-        {
-            return _friends.ToArray();
-        }
+            public Friend[] getFriends()
+            {
+                return _friends.ToArray();
+            }
 
-        public void rndUserNFriends()
-        {
-            var friendsArray = _friends.ToArray();
-            int index = rand.Next(_friends.Count);
-            var rndFriend = friendsArray[index];
-            var userNFriends = neo.numFriends(rndFriend);
-        }
+            public void rndUserNFriends()
+            {
+                var friendsArray = _friends.ToArray();
+                int index = rand.Next(_friends.Count);
+                var rndFriend = friendsArray[index];
+                var userNFriends = neo.numFriends(rndFriend);
+            }
 
-        private void allFriends()
-        {
-            _friends = neo.allFriends(); 
-        }
+            private void allFriends()
+            {
+                _friends = neo.allFriends(); 
+            }
         #endregion
 
-        private void initializePopulation()
+        private void initialization()
         {
-            Friend[] rndfrnd = _friends.ToArray();
+            // get an array copy of _friends because 
+            // it's easier to address by index
+            Friend[] frndArray = _friends.ToArray();
             foreach (Gene gene in population)
             {
-                Friend rnd = rndfrnd[rand.Next(rndfrnd.Length)];
-                UserNFriends unf = neo.getUserNFriends(rnd);
-                gene.bitString[unf.user.localID] = true;
-                Friend nothaFrnd = unf.popRndFrnd(rand);
-                gene.bitString[nothaFrnd.localID] = true;
-                while (unf.notEmpty())
+                // select a random friend f1 from the array
+                Friend rnd = frndArray[rand.Next(frndArray.Length)];
+                // get f1 and all of f1's friends
+                UserNFriends f1nFriends = neo.getUserNFriends(rnd);
+                // set f1 as part of the clique 
+                gene.bitString[f1nFriends.user.localID] = true;
+                // pop a random friend f2 from f1's list of friends
+                Friend f2 = f1nFriends.popRndFrnd(rand);
+                // set f2 as part of the clique
+                gene.bitString[f2.localID] = true;
+                // iterate through the remainder of f1's friend list
+                while (f1nFriends.notEmpty())
                 {
-                    Friend yetNuthaFrnd = unf.popRndFrnd(rand);
-                    if (gene.frndInClique(yetNuthaFrnd))
-                        gene.bitString[yetNuthaFrnd.localID] = true;
+                    // pop random friend fx from f1's list of friends
+                    Friend fx = f1nFriends.popRndFrnd(rand);
+                    // if part of the clique
+                    if (gene.frndInClique(fx, neo))
+                        // set fx as part of the clique
+                        gene.bitString[fx.localID] = true;
                 }
-                //gene.bitString[unf.friends[rand.Next(unf.friends.Length)].localID] = true;
-
+                // calculate the fitness of each gene 
+                // as they are created
+                gene.calcFitness();
             }
         }
 
-        private void testFitness()
-        {
-            foreach (Gene gene in population)
-            {
-            }
-        }
-
-        private void selectFitest()
+        private void selection()
         {
         }
 
-        private void recombine()
+        private void recombination()
         {
         }
 
-        private void mutate()
+        private void mutation()
         {
         }
 
-        private void replace()
+        private void extraction()
         {
         }
 
-        private void terminate()
+        private void replacement()
+        {
+        }
+
+        private void termination()
         {
         }
 
