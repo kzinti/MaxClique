@@ -11,8 +11,8 @@ namespace MaxClique
         #region Local Variable Declaration
             Neo neo;
             int generation = 0;
+            List<Gene> selected;
             int crossoverPoints = 10;
-            Gene[] selected = new Gene[2];
             Random rand = new Random(1);
             Gene[] population = new Gene[100];
             List<Friend> _friends = new List<Friend>();
@@ -81,6 +81,34 @@ namespace MaxClique
 
         private void selection()
         {
+            selected.Clear();
+            int populationFitness = 0;
+            // calculate total fitness of population
+            foreach (Gene gene in population)
+            {
+                populationFitness += gene.fitness;
+            }
+
+            selected.Add(selectHelper(populationFitness));
+            selected.Add(selectHelper(populationFitness));
+        }
+
+        private Gene selectHelper(int popFit)
+        {
+            // create a random number between 0 and 1
+            double percent = rand.NextDouble();
+            int partialFitness = 0;
+            Gene rtn = population[0];
+
+            // itterate through genes
+            foreach (Gene gene in population)
+            {
+                if (percent < (partialFitness / popFit))
+                    return gene;
+                rtn = gene;
+                partialFitness += gene.fitness;
+            }
+            return rtn;
         }
 
         private void recombination()
