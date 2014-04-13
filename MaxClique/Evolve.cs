@@ -9,44 +9,55 @@ namespace MaxClique
     class Evolve
     {
         #region Local Variable Declaration
-            Neo neo;
-            int generation = 0;
-            List<Gene> selected;
-            int crossoverPoints = 10;
-            Random rand = new Random(1);
-            Gene[] population = new Gene[100];
-            List<Friend> _friends = new List<Friend>();
+        Neo neo;                                        // database connection
+        int generation = 0;                             // generation counter
+        List<Gene> selected;                            // list of genes selected for recombination
+        int numGenerations = 20;                        // number of generations before reducing crossover and mutation
+        int crossoverPoints = 10;                       // number of crossover points
+        Random rand = new Random(1);                    // random number generator. this is passed to any function that needs random so can be controled
+        double mutationPercent = .5;
+        double mutationAmount = .2;
+        Gene[] population = new Gene[100];              // the population to evolve
+        List<Gene> childred = new List<Gene>();         // list of children created by recombination
+        List<Friend> _friends = new List<Friend>();     // friends list to hold all friends
         #endregion
 
         #region Constructor
-            public Evolve(Neo db)
-            {
-                neo = db;
-                allFriends();
-            }
+        public Evolve(Neo db)
+        {
+            neo = db;
+            allFriends();
+        }
         #endregion
 
-        #region Helper Methods
-            public Friend[] getFriends()
-            {
-                return _friends.ToArray();
-            }
+        #region Genetic Functions
 
-            public void rndUserNFriends()
+        internal void evolve()
+        {
+            initialize();
+            while (terminate() == false)
             {
-                var friendsArray = _friends.ToArray();
-                int index = rand.Next(_friends.Count);
-                var rndFriend = friendsArray[index];
-                var userNFriends = neo.numFriends(rndFriend);
-            }
+                generation++;
+                if (generation >= numGenerations)
+                {
+                    if (crossoverPoints > 2)
+                        crossoverPoints -= 2;
+                    if (mutationPercent > .05)
+                        mutationPercent -= .05;
+                    if (mutationAmount > .05)
+                        mutationAmount -= .05;
+                    generation = 0;
+                }
 
-            private void allFriends()
-            {
-                _friends = neo.allFriends(); 
+                selectParrents();
+                recombineParents();
+                mutateChildren();
+                extractClique();
+                replaceLessFit();
             }
-        #endregion
+        }
 
-        private void initialization()
+        private void initialize()
         {
             // get an array copy of _friends because 
             // it's easier to address by index
@@ -69,7 +80,7 @@ namespace MaxClique
                     // pop random friend fx from f1's list of friends
                     Friend fx = f1nFriends.popRndFrnd(rand);
                     // if part of the clique
-                    if (gene.frndInClique(fx, neo))
+                    if (frndInClique(fx))
                         // set fx as part of the clique
                         gene.bitString[fx.localID] = true;
                 }
@@ -79,7 +90,7 @@ namespace MaxClique
             }
         }
 
-        private void selection()
+        private void selectParrents()
         {
             selected.Clear();
             int populationFitness = 0;
@@ -91,6 +102,116 @@ namespace MaxClique
 
             selected.Add(selectHelper(populationFitness));
             selected.Add(selectHelper(populationFitness));
+        }
+
+        private void recombineParents()
+        {
+            Gene g1 = selected.ElementAt<Gene>(0);
+            Gene g2 = selected.ElementAt<Gene>(1);
+
+            Gene c1 = new Gene(g1.bitString.Length);
+            Gene c2 = new Gene(g2.bitString.Length);
+
+            double t = (g1.bitString.Length / crossoverPoints);
+            int split = (int) Math.Floor(t);
+            bool flip = false;
+            for (int i = 0; i < g1.bitString.Length; i++)
+            {
+                if (flip == true)
+                {
+                    c1.bitString[i] = g1.bitString[i];
+                    c2.bitString[i] = g2.bitString[i];
+                }
+                else
+                {
+                    c1.bitString[i] = g2.bitString[i];
+                    c2.bitString[i] = g1.bitString[i];
+                }
+
+                if ((i % split) == 0)
+                {
+                    if (flip == true)
+                        flip = false;
+                    else
+                        flip = true;
+                }
+            }
+        }
+
+        private void mutateChildren()
+        {
+        }
+
+        private void extractClique()
+        {
+            foreach (Gene g in childred)
+            {
+                while (!isClique(g))
+                    removeSmallest(g);
+            }
+        }
+
+        private void replaceLessFit()
+        {
+        }
+
+        private bool terminate()
+        {
+            return false;
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private void allFriends()
+        {
+            _friends = neo.allFriends(); 
+        }
+
+        public Friend[] getFriends()
+        {
+            return _friends.ToArray();
+        }
+
+        public void rndUserNFriends()
+        {
+            var friendsArray = _friends.ToArray();
+            int index = rand.Next(_friends.Count);
+            var rndFriend = friendsArray[index];
+            var userNFriends = neo.numFriends(rndFriend);
+        }
+
+        private bool isClique(Gene g)
+        {
+            for (int i = 0; i < g.bitString.Length; i++)
+                if (g.bitString.ElementAt<bool>(i)==true)
+                    for (int j = i + 1; j < g.bitString.Length; j++)
+                        if (g.bitString.ElementAt<bool>(j)==true)
+                            if (!neo.friends(neo.getUser(i), neo.getUser(j)))
+                                return false;
+            return true;
+        }
+
+        private void removeSmallest(Gene g)
+        {
+            for (int i = g.bitString.Length; i > 0; i--)
+                if (g.bitString.ElementAt<bool>(i) == true)
+                    g.bitString[i] = false;
+        }
+
+        private bool frndInClique(Friend f1)
+        {
+            foreach (bool bit in g.bitString)
+                if (bit == true)
+                {
+                    int localID = g.bitList.IndexOf(bit);
+                    Friend f2 = neo.getUser(localID);
+                    if (!neo.friends(f1, f2))
+                        return false;
+                }
+            return true;
+
         }
 
         private Gene selectHelper(int popFit)
@@ -111,25 +232,7 @@ namespace MaxClique
             return rtn;
         }
 
-        private void recombination()
-        {
-        }
-
-        private void mutation()
-        {
-        }
-
-        private void extraction()
-        {
-        }
-
-        private void replacement()
-        {
-        }
-
-        private void termination()
-        {
-        }
+        #endregion
 
     }
 }

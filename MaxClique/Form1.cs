@@ -75,8 +75,6 @@ namespace MaxClique
 
         #endregion
 
-        #region Helper Methods
-
         #region ListView Helpers
 
         private void UpdateListView()
@@ -101,8 +99,5 @@ namespace MaxClique
         }
 
         #endregion
-
-        #endregion
-
     }
 }
