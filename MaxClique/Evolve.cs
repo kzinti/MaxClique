@@ -11,12 +11,13 @@ namespace MaxClique
         #region Local Variable Declaration
         Neo neo;                                        // database connection
         int generation = 0;                             // generation counter
+        int numFriends = 85;
         List<Gene> selected;                            // list of genes selected for recombination
         int numGenerations = 20;                        // number of generations before reducing crossover and mutation
         int crossoverPoints = 10;                       // number of crossover points
+        double mutationAmount = .2;                     // amount of gene that will be mutated
+        double mutationPercent = .5;                    // likelyhood that a gene will be mutated
         Random rand = new Random(1);                    // random number generator. this is passed to any function that needs random so can be controled
-        double mutationPercent = .5;
-        double mutationAmount = .2;
         Gene[] population = new Gene[100];              // the population to evolve
         List<Gene> childred = new List<Gene>();         // list of children created by recombination
         List<Friend> _friends = new List<Friend>();     // friends list to hold all friends
@@ -106,26 +107,26 @@ namespace MaxClique
 
         private void recombineParents()
         {
-            Gene g1 = selected.ElementAt<Gene>(0);
-            Gene g2 = selected.ElementAt<Gene>(1);
+            Gene p1 = selected.ElementAt<Gene>(0);
+            Gene p2 = selected.ElementAt<Gene>(1);
 
-            Gene c1 = new Gene(g1.bitString.Length);
-            Gene c2 = new Gene(g2.bitString.Length);
+            Gene c1 = new Gene(p1.bitString.Length);
+            Gene c2 = new Gene(p2.bitString.Length);
 
-            double t = (g1.bitString.Length / crossoverPoints);
+            double t = (p1.bitString.Length / crossoverPoints);
             int split = (int) Math.Floor(t);
             bool flip = false;
-            for (int i = 0; i < g1.bitString.Length; i++)
+            for (int i = 0; i < p1.bitString.Length; i++)
             {
                 if (flip == true)
                 {
-                    c1.bitString[i] = g1.bitString[i];
-                    c2.bitString[i] = g2.bitString[i];
+                    c1.bitString[i] = p1.bitString[i];
+                    c2.bitString[i] = p2.bitString[i];
                 }
                 else
                 {
-                    c1.bitString[i] = g2.bitString[i];
-                    c2.bitString[i] = g1.bitString[i];
+                    c1.bitString[i] = p2.bitString[i];
+                    c2.bitString[i] = p1.bitString[i];
                 }
 
                 if ((i % split) == 0)
@@ -136,10 +137,21 @@ namespace MaxClique
                         flip = true;
                 }
             }
+            childred.Add(c1);
+            childred.Add(c2);
         }
 
         private void mutateChildren()
         {
+            if ( rand.NextDouble() < mutationPercent)
+            {
+                int rnd = rand.Next(numFriends);
+                if (childred[0].bitString[rnd] == false)
+                    childred[0].bitString[rnd] = true;
+                else
+                    childred[0].bitString[rnd] = false;
+            }
+
         }
 
         private void extractClique()
@@ -197,7 +209,10 @@ namespace MaxClique
         {
             for (int i = g.bitString.Length; i > 0; i--)
                 if (g.bitString.ElementAt<bool>(i) == true)
+                {
                     g.bitString[i] = false;
+                    break;
+                }
         }
 
         private bool frndInClique(Friend f1)
