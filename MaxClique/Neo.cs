@@ -10,7 +10,7 @@ namespace MaxClique
 {
     class Neo
     {
-        GraphClient client = new GraphClient(new Uri("http://192.168.0.100:7474/db/data"));
+        GraphClient client = new GraphClient(new Uri("http://192.168.0.101:7474/db/data"));
 
         public Neo()
         {
@@ -19,6 +19,17 @@ namespace MaxClique
 
         internal bool friends(Friend f1, Friend f2)
         {
+            var daFriends = client.Cypher
+                .Match("(u1:Friend)", "(u2:Friend)")
+                .Where((Friend u1) => u1.ID == f1.ID)
+                .AndWhere((Friend u2) => u2.ID == f2.ID)
+                .AndWhere("(u1)-[:FRIENDS_WITH]-(u2)")
+                .Return((u1) => u1.As<Friend>())
+                .Results;
+            if (daFriends.Count() > 0)
+                return true;
+            else
+                return false;
 
         }
 
@@ -34,14 +45,24 @@ namespace MaxClique
         public dynamic getUserNFriends(Friend usr)
         {
             var usrWfrnd = client.Cypher
-                .OptionalMatch("(user:Friend)-[FRIENDS_WITH]-(friend:Friend)")
+                .Match("(user:Friend)-[FRIENDS_WITH]-(friend:Friend)")
                 .Where((Friend user) => user.ID == usr.ID)
                 .Return((user, friend) => new {
                     user = user.As<Friend>(),
-                    friends = friend.CollectAs<Friend>()
+                    _friends = friend.CollectAs<Friend>()
                 })
-                .Results;
-            return (UserNFriends) usrWfrnd;
+                .Results.ToList();
+            //Friend[] fndary = new Friend[usrWfrnd.ElementAt(0)._friends.Count()];
+            List<Friend> fndlst = new List<Friend>();
+            if (usrWfrnd.ElementAt(0)._friends.Count() > 0)
+            {
+                foreach (var f in usrWfrnd.ElementAt(0)._friends)
+                {
+                    fndlst.Add(f.Data);
+                }
+            }
+            UserNFriends rtn = new UserNFriends { _friends = fndlst, user = usrWfrnd.ElementAt(0).user };
+            return rtn;
         }
 
         public dynamic numFriends(Friend usr)
@@ -99,11 +120,11 @@ namespace MaxClique
 
         internal Friend getUser(int localID)
         {
-            Friend frnd = (Friend) client.Cypher
+            Friend frnd = (Friend)client.Cypher
                 .Match("(u:Friend)")
-                .Where((Friend user) => user.localID == localID)
-                .Return((user) => user)
-                .Results;
+                .Where((Friend u) => u.localID == localID)
+                .Return(u => u.As<Friend>())
+                .Results.ElementAt(0);
             return frnd;
         }
     }

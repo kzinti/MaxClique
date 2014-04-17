@@ -8,20 +8,19 @@ namespace MaxClique
 {
     public class Gene
     {
+        public int ID { get; set; }
         public bool[] bitString { get; set; }
         public int fitness { get; set; }
-        internal List<bool> bitList { get; set; }
 
         public Gene(int size)
         {
             bitString = new bool[size];
-            bitList = bitString.ToList<bool>();
         }
 
         internal void calcFitness()
         {
             fitness = 0;
-            foreach (bool bit in bitList)
+            foreach (bool bit in bitString)
                 if (bit == true)
                     fitness++;
         }

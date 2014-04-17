@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 using Facebook;
 
 namespace MaxClique
@@ -20,7 +21,9 @@ namespace MaxClique
         #region Local Variable Declaration
 
         private Neo db;
+        private List<Friend> MaximumClique;
         private Evolve evolve;
+        Series seriesPoint = new Series();
         private GraphBuilder gb;
         private FBLogin fbLoginBrowser;
         private FacebookConnection fc = new FacebookConnection();
@@ -32,6 +35,7 @@ namespace MaxClique
         public Form1()
         {
             InitializeComponent();
+            seriesPoint.ChartType = SeriesChartType.FastPoint;
             db = new Neo();
             gb = new GraphBuilder(db, fc);
             evolve = new Evolve(db);
@@ -54,13 +58,13 @@ namespace MaxClique
 
         private void updateList_Click(object sender, EventArgs e)
         {
-            UpdateListView();
         }
 
         private void initPopulation_Click(object sender, EventArgs e)
         {
             //evolve.rndUserNFriends();
-            gb.setLocalIDs();
+            MaximumClique = evolve.evolve();
+            UpdateListView();
         }
 
         private void neoConnect_Click(object sender, EventArgs e)
@@ -82,7 +86,7 @@ namespace MaxClique
 
             friendsListView.Items.Clear();
 
-            foreach (Friend friend in evolve.getFriends())
+            foreach (Friend friend in MaximumClique)
             {
                 AddFriendToListView(friend);
             }
